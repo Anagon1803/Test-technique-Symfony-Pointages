@@ -49,6 +49,10 @@ class Clocking
 
     public function getProjectsClocked(): Collection
     {
+        // Si jamais la collection est nulle, on retourne une ArrayCollection vide
+        if ($this->projectsClocked === null) {
+            $this->projectsClocked = new ArrayCollection();
+        }
         return $this->projectsClocked;
     }
 
