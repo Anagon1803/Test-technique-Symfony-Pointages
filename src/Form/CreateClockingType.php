@@ -34,10 +34,12 @@ class CreateClockingType extends
         //     'label'        => 'entity.Clocking.clockingProject',
         // ]);
         $builder->add('projectsClocked', CollectionType::class, [
-            'entry_type' => ProjectClockingType::class, // Crée un formulaire pour ProjectClocking
+            'entry_type' => ProjectClockingType::class,
             'allow_add' => true,
             'allow_delete' => true,
             'by_reference' => false,
+            'prototype' => true, // Assurez-vous que 'prototype' est activé
+            'prototype_name' => '__name__', // Ceci permet de remplacer __name__ dans le prototype
         ]);
         $builder->add('clockingUser', EntityType::class, [
             'class'        => User::class,

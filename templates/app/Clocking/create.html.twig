@@ -22,27 +22,9 @@
     </div>
 
     <!-- Liste des projets pointés (chantiers) et durées -->
-    <div id="projects-clocked">
+    <div id="projects-clocked" data-prototype="{{ form_row(form.projectsClocked.vars.prototype)|e('html') }}">
         <h3>Chantiers et durées</h3>
-
-        {% for projectClocking in form.projectsClocked %}
-            <div class="project-clocked-item">
-                <div>
-                    {{ form_label(projectClocking.project) }}
-                    {{ form_widget(projectClocking.project) }}
-                    {{ form_errors(projectClocking.project) }}
-                </div>
-
-                <div>
-                    {{ form_label(projectClocking.duration) }}
-                    {{ form_widget(projectClocking.duration) }}
-                    {{ form_errors(projectClocking.duration) }}
-                </div>
-
-                <!-- Bouton pour supprimer un chantier -->
-                <button type="button" class="remove-project">Supprimer ce chantier</button>
-            </div>
-        {% endfor %}
+        {{ form_widget(form.projectsClocked) }}
     </div>
 
     <!-- Bouton pour ajouter un nouveau chantier -->
@@ -55,44 +37,51 @@
 
     {{ form_end(form) }}
 
-    <!-- Prototype pour les nouveaux chantiers ajoutés dynamiquement -->
-    <div id="project-clocked-prototype" style="display: none;">
-        <div class="project-clocked-item">
-            <div>
-                {{ form_widget(form.projectsClocked.vars.prototype.project) }}
-            </div>
-            <div>
-                {{ form_widget(form.projectsClocked.vars.prototype.duration) }}
-            </div>
-            <button type="button" class="remove-project">Supprimer ce chantier</button>
-        </div>
-    </div>
-
     <script>
-        // Ajout et suppression dynamiques des chantiers
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const durations = document.querySelectorAll('input[name*="[duration]"]');
+            let valid = true;
 
-        let projectClockedIndex = {{ form.projectsClocked|length }};
-        const projectsClockedContainer = document.getElementById('projects-clocked');
-        const prototype = document.getElementById('project-clocked-prototype').innerHTML;
+            durations.forEach(input => {
+                const value = parseInt(input.value, 10);
+                if (!value || value <= 0) {
+                    alert('Veuillez entrer une durée valide pour chaque projet.');
+                    valid = false;
+                }
+            });
 
-        // Fonction pour ajouter un nouveau chantier
-        document.getElementById('add-project').addEventListener('click', function () {
-            const newForm = prototype.replace(/__name__/g, projectClockedIndex);
-            projectsClockedContainer.insertAdjacentHTML('beforeend', newForm);
-            projectClockedIndex++;
-            attachRemoveButtons();
+            if (!valid) {
+                event.preventDefault();  // Empêche l'envoi du formulaire si une durée est invalide
+            }
         });
 
-        // Fonction pour attacher la suppression des chantiers
-        function attachRemoveButtons() {
-            document.querySelectorAll('.remove-project').forEach(function (button) {
-                button.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    button.closest('.project-clocked-item').remove();
-                });
+        document.getElementById('add-project').addEventListener('click', function() {
+            const container = document.querySelector('#projects-clocked');
+            const prototype = container.dataset.prototype; // Récupérer le prototype
+            const index = container.children.length; // Compter les enfants pour obtenir l'index
+
+            // Créer le nouveau formulaire en remplaçant __name__ par l'index
+            const newForm = prototype.replace(/__name__/g, index);
+            container.insertAdjacentHTML('beforeend', newForm);
+
+            // Attacher l'événement de suppression pour le nouveau projet
+            addRemoveButtonListeners();
+        });
+
+        function addRemoveButtonListeners() {
+            document.querySelectorAll('.remove-project').forEach(button => {
+                button.removeEventListener('click', removeProject); // Éviter les attachements multiples
+                button.addEventListener('click', removeProject);
             });
         }
 
-        attachRemoveButtons();
+        function removeProject(e) {
+            e.preventDefault();
+            this.closest('.project-clocked-item').remove();
+        }
+
+        // Initialiser les boutons de suppression existants
+        addRemoveButtonListeners();
     </script>
+
 {% endblock %}
