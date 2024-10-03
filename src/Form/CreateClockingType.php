@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CreateClockingType extends
     AbstractType
@@ -27,10 +28,16 @@ class CreateClockingType extends
         FormBuilderInterface $builder,
         array                $options
     ) : void {
-        $builder->add('clockingProject', EntityType::class, [
-            'class'        => Project::class,
-            'choice_label' => 'name',
-            'label'        => 'entity.Clocking.clockingProject',
+        // $builder->add('clockingProject', EntityType::class, [
+        //     'class'        => Project::class,
+        //     'choice_label' => 'name',
+        //     'label'        => 'entity.Clocking.clockingProject',
+        // ]);
+        $builder->add('projectsClocked', CollectionType::class, [
+            'entry_type' => ProjectClockingType::class, // Crée un formulaire pour ProjectClocking
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
         ]);
         $builder->add('clockingUser', EntityType::class, [
             'class'        => User::class,
@@ -46,9 +53,9 @@ class CreateClockingType extends
         $builder->add('date', DateType::class, [
             'label' => 'entity.Clocking.dateEnd',
         ]);
-        $builder->add('duration', IntegerType::class, [
-            'label' => 'entity.Clocking.duration',
-        ]);
+        // $builder->add('duration', IntegerType::class, [
+        //     'label' => 'entity.Clocking.duration',
+        // ]);
         $builder->add('submit', SubmitType::class, [
             'label' => 'Créer',
         ]);

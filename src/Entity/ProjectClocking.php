@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ProjectClockingRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+// #[ORM\Entity]
+#[ORM\Table(name: 'project_clocking')]
 #[ORM\Entity(repositoryClass: ProjectClockingRepository::class)]
 class ProjectClocking
 {

@@ -32,13 +32,15 @@ class Clocking
     // #[ORM\Column(type: Types::INTEGER)]
     // private ?int               $duration        = null;
 
+    /**
+     * @ORM\OneToMany(targetEntity=ProjectClocking::class, mappedBy="clocking", cascade={"persist", "remove"})
+     */
+    private $projectsClocked;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int               $id              = null;
-
-    #[ORM\OneToMany(mappedBy: 'clocking', targetEntity: ProjectClocking::class, cascade: ['persist', 'remove'])]
-    private ?Collection           $projectsClocked = null;
 
     public function __construct()
     {
@@ -50,17 +52,27 @@ class Clocking
         return $this->projectsClocked;
     }
 
-    // public function getClockingProject() : ?Project
-    // {
-    //     return $this->clockingProject;
-    // }
+    public function addProjectClocked(ProjectClocking $projectClocking): self
+    {
+        if (!$this->projectsClocked->contains($projectClocking)) {
+            $this->projectsClocked[] = $projectClocking;
+            $projectClocking->setClocking($this);
+        }
 
-    // public function setClockingProject(?Project $clockingProject) : static
-    // {
-    //     $this->clockingProject = $clockingProject;
+        return $this;
+    }
 
-    //     return $this;
-    // }
+    public function removeProjectClocked(ProjectClocking $projectClocking): self
+    {
+        if ($this->projectsClocked->removeElement($projectClocking)) {
+            // Si l'élément est supprimé, dissocie l'entrée correspondante
+            if ($projectClocking->getClocking() === $this) {
+                $projectClocking->setClocking(null);
+            }
+        }
+
+        return $this;
+    }
 
     public function getClockingUser() : ?User
     {

@@ -8,9 +8,9 @@
         <thead>
             <tr>
                 <td>{{ 'entity.Clocking.date'|trans }}</td>
-                <td>{{ 'entity.Clocking.duration'|trans }}</td>
-                <td>{{ 'entity.Clocking.clockingProject'|trans }}</td>
+                <td>Projet</td>
                 <td>{{ 'entity.Clocking.clockingUser'|trans }}</td>
+                <td>Durée (heures)</td>
                 <td>Actions</td>
             </tr>
         </thead>
@@ -18,9 +18,23 @@
             {% for clocking in clockings %}
                 <tr>
                     <td>{{ clocking.date|date }}</td>
-                    <td>{{ clocking.duration }}</td>
-                    <td>{{ clocking.clockingProject.name }}</td>
+                    <td>
+                        {% if clocking.projectsClocked is not empty %}
+                            {% for projectClocking in clocking.projectsClocked %}
+                                {{ projectClocking.project.name }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            Aucune
+                        {% endif %}
+                    </td>
                     <td>{{ clocking.clockingUser.lastName }} {{ clocking.clockingUser.firstName }}</td>
+                    <td>
+                        {% set totalDuration = 0 %}
+                        {% for projectClocking in clocking.projectsClocked %}
+                            {% set totalDuration = totalDuration + projectClocking.duration %}
+                        {% endfor %}
+                        {{ totalDuration }}
+                    </td>
                     <td>
                         <a href="{{ path('app_Clocking_delete', {id: clocking.id}) }}">Supprimer</a>
                     </td>

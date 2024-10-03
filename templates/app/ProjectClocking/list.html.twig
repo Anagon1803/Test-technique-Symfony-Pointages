@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <table>
+        <thead>
+            <tr>
+                <td>{{ 'entity.ProjectClocking.project'|trans }}</td>
+                <td>{{ 'entity.ProjectClocking.duration'|trans }}</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for project_clocking in project_clockings %}
+                <tr>
+                    <td>{{ project_clocking.project }}</td>
+                    <td>{{ project_clocking.duration }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

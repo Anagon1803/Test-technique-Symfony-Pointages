@@ -1,14 +1,98 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Créer un pointage{% endblock %}
+
 {% block body %}
-    {{ form_start(form) }}
+    <h1>Créer un pointage pour un collaborateur</h1>
 
     {{ form_start(form) }}
 
-    {{ form_row(form.clockingProject) }}
-    {{ form_row(form.clockingUser) }}
-    {{ form_row(form.date) }}
-    {{ form_row(form.duration) }}
+    <!-- Sélection du collaborateur -->
+    <div>
+        {{ form_label(form.clockingUser) }}
+        {{ form_widget(form.clockingUser) }}
+        {{ form_errors(form.clockingUser) }}
+    </div>
+
+    <!-- Sélection de la date -->
+    <div>
+        {{ form_label(form.date) }}
+        {{ form_widget(form.date) }}
+        {{ form_errors(form.date) }}
+    </div>
+
+    <!-- Liste des projets pointés (chantiers) et durées -->
+    <div id="projects-clocked">
+        <h3>Chantiers et durées</h3>
+
+        {% for projectClocking in form.projectsClocked %}
+            <div class="project-clocked-item">
+                <div>
+                    {{ form_label(projectClocking.project) }}
+                    {{ form_widget(projectClocking.project) }}
+                    {{ form_errors(projectClocking.project) }}
+                </div>
+
+                <div>
+                    {{ form_label(projectClocking.duration) }}
+                    {{ form_widget(projectClocking.duration) }}
+                    {{ form_errors(projectClocking.duration) }}
+                </div>
+
+                <!-- Bouton pour supprimer un chantier -->
+                <button type="button" class="remove-project">Supprimer ce chantier</button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Bouton pour ajouter un nouveau chantier -->
+    <button type="button" id="add-project">Ajouter un chantier</button>
+
+    <!-- Soumission du formulaire -->
+    <div>
+        {{ form_widget(form.submit) }}
+    </div>
 
     {{ form_end(form) }}
+
+    <!-- Prototype pour les nouveaux chantiers ajoutés dynamiquement -->
+    <div id="project-clocked-prototype" style="display: none;">
+        <div class="project-clocked-item">
+            <div>
+                {{ form_widget(form.projectsClocked.vars.prototype.project) }}
+            </div>
+            <div>
+                {{ form_widget(form.projectsClocked.vars.prototype.duration) }}
+            </div>
+            <button type="button" class="remove-project">Supprimer ce chantier</button>
+        </div>
+    </div>
+
+    <script>
+        // Ajout et suppression dynamiques des chantiers
+
+        let projectClockedIndex = {{ form.projectsClocked|length }};
+        const projectsClockedContainer = document.getElementById('projects-clocked');
+        const prototype = document.getElementById('project-clocked-prototype').innerHTML;
+
+        // Fonction pour ajouter un nouveau chantier
+        document.getElementById('add-project').addEventListener('click', function () {
+            const newForm = prototype.replace(/__name__/g, projectClockedIndex);
+            projectsClockedContainer.insertAdjacentHTML('beforeend', newForm);
+            projectClockedIndex++;
+            attachRemoveButtons();
+        });
+
+        // Fonction pour attacher la suppression des chantiers
+        function attachRemoveButtons() {
+            document.querySelectorAll('.remove-project').forEach(function (button) {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    button.closest('.project-clocked-item').remove();
+                });
+            });
+        }
+
+        attachRemoveButtons();
+    </script>
 {% endblock %}
