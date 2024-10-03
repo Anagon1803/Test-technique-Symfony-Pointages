@@ -8,40 +8,59 @@ use App\Repository\ClockingRepository;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClockingRepository::class)]
 class Clocking
 {
 
-    #[ORM\ManyToOne(inversedBy: 'clockings')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Project           $clockingProject = null;
+    // #[ORM\ManyToOne(inversedBy: 'clockings')]
+    // #[ORM\JoinColumn(nullable: false)]
+    // private ?Project           $clockingProject = null;
+
     #[ORM\ManyToOne(inversedBy: 'clockings')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User              $clockingUser    = null;
+
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?DateTimeInterface $date            = null;
-    #[Assert\Positive]
-    #[Assert\LessThanOrEqual(value: 10)]
-    #[ORM\Column(type: Types::INTEGER)]
-    private ?int               $duration        = null;
+
+    // #[Assert\Positive]
+    // #[Assert\LessThanOrEqual(value: 10)]
+    // #[ORM\Column(type: Types::INTEGER)]
+    // private ?int               $duration        = null;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int               $id              = null;
 
-    public function getClockingProject() : ?Project
+    #[ORM\OneToMany(mappedBy: 'clocking', targetEntity: ProjectClocking::class, cascade: ['persist', 'remove'])]
+    private ?Collection           $projectsClocked = null;
+
+    public function __construct()
     {
-        return $this->clockingProject;
+        $this->projectsClocked = new ArrayCollection();
     }
 
-    public function setClockingProject(?Project $clockingProject) : static
+    public function getProjectsClocked(): Collection
     {
-        $this->clockingProject = $clockingProject;
-
-        return $this;
+        return $this->projectsClocked;
     }
+
+    // public function getClockingProject() : ?Project
+    // {
+    //     return $this->clockingProject;
+    // }
+
+    // public function setClockingProject(?Project $clockingProject) : static
+    // {
+    //     $this->clockingProject = $clockingProject;
+
+    //     return $this;
+    // }
 
     public function getClockingUser() : ?User
     {
@@ -65,15 +84,15 @@ class Clocking
         $this->date = $date;
     }
 
-    public function getDuration() : ?int
-    {
-        return $this->duration;
-    }
+    // public function getDuration() : ?int
+    // {
+    //     return $this->duration;
+    // }
 
-    public function setDuration(?int $duration) : void
-    {
-        $this->duration = $duration;
-    }
+    // public function setDuration(?int $duration) : void
+    // {
+    //     $this->duration = $duration;
+    // }
 
     public function getId() : ?int
     {
