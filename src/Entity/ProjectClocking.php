@@ -15,7 +15,7 @@ class ProjectClocking
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Clocking::class)]
+    #[ORM\ManyToOne(targetEntity: Clocking::class, inversedBy: 'projectsClocked')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Clocking $clocking = null;
 

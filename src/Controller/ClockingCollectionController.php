@@ -32,10 +32,13 @@ class ClockingCollectionController extends
         Request                $request,
     ) : Response {
         $form = $this->createForm(CreateClockingType::class);
-        $form->handleRequest($request);
+        // $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()) {
             $clocking = $form->getData();
+
+            // Debug ici pour vérifier la valeur de $clocking
+            dump($clocking);
 
             $entityManager->persist($clocking);
             $entityManager->flush();

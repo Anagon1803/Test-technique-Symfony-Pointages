@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClockingRepository::class)]
 class Clocking
@@ -32,10 +31,8 @@ class Clocking
     // #[ORM\Column(type: Types::INTEGER)]
     // private ?int               $duration        = null;
 
-    /**
-     * @ORM\OneToMany(targetEntity=ProjectClocking::class, mappedBy="clocking", cascade={"persist", "remove"})
-     */
-    private $projectsClocked;
+    #[ORM\OneToMany(targetEntity: ProjectClocking::class, mappedBy: 'clocking', cascade: ['persist', 'remove'])]
+    private Collection $projectsClocked;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -114,4 +111,23 @@ class Clocking
     {
         return $this->id;
     }
+
+    public function getTotalDuration(): float
+    {
+        $totalDuration = 0;
+        foreach ($this->projectsClocked as $projectClocking) {
+            $totalDuration += $projectClocking->getDuration() ?? 0; // Ajoute la durée si elle existe
+        }
+        return $totalDuration;
+    }
+    
+    public function getProjectNames(): array
+    {
+        $projectNames = [];
+        foreach ($this->projectsClocked as $projectClocking) {
+            $projectNames[] = $projectClocking->getProject()->getName(); // Récupère le nom du projet
+        }
+        return $projectNames;
+    }
+
 }
